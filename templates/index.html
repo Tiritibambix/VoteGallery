@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote Gallery - Instructions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="instructions-card">
+            <h1>📸 Vote Gallery</h1>
+            <p>Bienvenue ! Vous allez voter pour vos 20 photos préférées.</p>
+            <div class="instructions-box">
+                <h2>Comment ça marche ?</h2>
+                <ul>
+                    <li>Accédez à la galerie de photos</li>
+                    <li>Votez pour vos 20 photos préférées</li>
+                    <li>Un vote par photo, max 20 votes au total</li>
+                    <li>Cliquez sur une photo pour la voir en grand</li>
+                </ul>
+            </div>
+            <a href="/gallery" class="btn btn-primary">Accéder à la galerie →</a>
+        </div>
+    </div>
+</body>
+</html>
