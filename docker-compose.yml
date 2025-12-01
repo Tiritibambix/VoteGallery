@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  photo-vote:
+    build: .
+    ports:
+      - "7845:5000"
+    environment:
+      - ADMIN_PASSWORD=votreMotDePasseSecurise
+    volumes:
+      - ./photos:/app/photos
+      - ./votes.db:/app/votes.db
+    restart: unless-stopped

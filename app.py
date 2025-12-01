@@ -9,7 +9,7 @@ import base64
 app = Flask(__name__, static_folder='static', template_folder='templates')
 DB_PATH = 'votes.db'
 PHOTOS_DIR = 'photos'
-ADMIN_PASSWORD = 'admin123'
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 MAX_VOTES = 20
 
 # Initialiser la base de données
