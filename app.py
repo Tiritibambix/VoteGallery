@@ -76,37 +76,50 @@ def api_user_votes():
     c = conn.cursor()
     c.execute('SELECT COUNT(*) FROM votes WHERE user_id = ?', (user_id,))
     count = c.fetchone()[0]
+    
+    c.execute('SELECT photo FROM votes WHERE user_id = ?', (user_id,))
+    voted_photos = [row[0] for row in c.fetchall()]
     conn.close()
-    return jsonify({'votes': count})
+    
+    return jsonify({'votes': count, 'voted_photos': voted_photos})
 
 @app.route('/api/vote', methods=['POST'])
 def api_vote():
-    data = request.get_json()
-    photo = data.get('photo')
-    user_id = get_user_id()
-    
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    
-    # Vérifier si user a déjà voté 20 fois
-    c.execute('SELECT COUNT(*) FROM votes WHERE user_id = ?', (user_id,))
-    if c.fetchone()[0] >= MAX_VOTES:
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid JSON'}), 400
+        
+        photo = data.get('photo')
+        if not photo:
+            return jsonify({'error': 'Missing photo'}), 400
+        
+        user_id = get_user_id()
+        
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        # Vérifier si user a déjà voté 20 fois
+        c.execute('SELECT COUNT(*) FROM votes WHERE user_id = ?', (user_id,))
+        if c.fetchone()[0] >= MAX_VOTES:
+            conn.close()
+            return jsonify({'error': 'Max votes reached'}), 400
+        
+        # Vérifier si user a déjà voté pour cette photo
+        c.execute('SELECT COUNT(*) FROM votes WHERE user_id = ? AND photo = ?', (user_id, photo))
+        if c.fetchone()[0] > 0:
+            conn.close()
+            return jsonify({'error': 'Already voted'}), 400
+        
+        # Enregistrer le vote
+        c.execute('INSERT INTO votes (user_id, photo, timestamp) VALUES (?, ?, ?)',
+                  (user_id, photo, datetime.now()))
+        conn.commit()
         conn.close()
-        return jsonify({'error': 'Max votes reached'}), 400
-    
-    # Vérifier si user a déjà voté pour cette photo
-    c.execute('SELECT COUNT(*) FROM votes WHERE user_id = ? AND photo = ?', (user_id, photo))
-    if c.fetchone()[0] > 0:
-        conn.close()
-        return jsonify({'error': 'Already voted'}), 400
-    
-    # Enregistrer le vote
-    c.execute('INSERT INTO votes (user_id, photo, timestamp) VALUES (?, ?, ?)',
-              (user_id, photo, datetime.now()))
-    conn.commit()
-    conn.close()
-    
-    return jsonify({'success': True})
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/admin/stats')
 @require_auth

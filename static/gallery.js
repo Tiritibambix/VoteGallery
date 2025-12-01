@@ -9,6 +9,8 @@ fetch('/api/photos')
     .then(r => r.json())
     .then(data => {
         photos = data;
+        // Mélanger aléatoirement
+        photos.sort(() => Math.random() - 0.5);
         renderGallery();
         updateVoteCount();
     });
@@ -25,6 +27,8 @@ function updateVoteCount() {
                 document.getElementById('completion-message').style.display = 'block';
                 document.querySelectorAll('.vote-btn').forEach(btn => btn.disabled = true);
             }
+            
+            updateButtonStates();
         });
 }
 
@@ -37,7 +41,7 @@ function renderGallery() {
         const card = document.createElement('div');
         card.className = 'photo-card';
         card.innerHTML = `
-            <img class="photo-img" src="/photos/${photo}" alt="${photo}">
+            <img class="photo-img" src="/photos/${photo}" alt="Photo">
             <div class="photo-footer">
                 <button class="vote-btn" data-photo="${photo}">Vote</button>
             </div>
@@ -56,6 +60,23 @@ function renderGallery() {
     });
 }
 
+// Mettre à jour les états des boutons
+function updateButtonStates() {
+    fetch('/api/user_votes')
+        .then(r => r.json())
+        .then(data => {
+            const votedPhotos = data.voted_photos || [];
+            document.querySelectorAll('.vote-btn').forEach(btn => {
+                const photo = btn.dataset.photo;
+                if (votedPhotos.includes(photo)) {
+                    btn.textContent = '✓ Voté';
+                    btn.disabled = true;
+                    btn.classList.add('voted');
+                }
+            });
+        });
+}
+
 // Enregistrer un vote
 function vote(photo, btn) {
     if (userVotes >= 20) return;
@@ -65,7 +86,14 @@ function vote(photo, btn) {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({photo})
     })
-    .then(r => r.json())
+    .then(r => {
+        if (!r.ok) {
+            return r.json().then(data => {
+                throw new Error(data.error || 'Erreur serveur');
+            });
+        }
+        return r.json();
+    })
     .then(data => {
         if (data.success) {
             btn.textContent = '✓ Voté';
@@ -74,7 +102,10 @@ function vote(photo, btn) {
             updateVoteCount();
         }
     })
-    .catch(e => alert('Erreur : ' + e));
+    .catch(e => {
+        console.error('Erreur:', e);
+        alert('Erreur : ' + e.message);
+    });
 }
 
 // Modal zoom
