@@ -105,4 +105,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: ${{ env.IMAGE_NAME }}
           readme-filepath: ./README.md
-          short-description: "A siple gallery for voting"
+          short-description: "A simple gallery for voting"
