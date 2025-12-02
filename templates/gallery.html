@@ -28,6 +28,15 @@
         <div class="modal-caption" id="modal-caption"></div>
     </div>
 
+    <div id="completion-modal" class="completion-modal" style="display:none;">
+        <div class="completion-content">
+            <h2>✅ Merci !</h2>
+            <p>Tu as voté pour les 20 photos.</p>
+            <p class="completion-message">Tes votes ont été enregistrés avec succès.</p>
+            <button class="btn btn-primary" onclick="location.href='/'">Retour à l'accueil</button>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='gallery.js') }}"></script>
 </body>
 </html>

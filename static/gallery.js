@@ -3,6 +3,7 @@ let userVotes = 0;
 let modal = document.getElementById('modal');
 let modalImg = document.getElementById('modal-img');
 let closeBtn = document.querySelector('.close');
+let completionModal = document.getElementById('completion-modal');
 
 // Charger les photos
 fetch('/api/photos')
@@ -24,12 +25,18 @@ function updateVoteCount() {
             document.getElementById('vote-count').textContent = userVotes;
             
             if (userVotes >= 20) {
-                document.getElementById('completion-message').style.display = 'block';
-                document.querySelectorAll('.vote-btn').forEach(btn => btn.disabled = true);
+                showCompletionModal();
             }
             
             updateButtonStates();
         });
+}
+
+// Afficher le modal de completion
+function showCompletionModal() {
+    completionModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    document.querySelectorAll('.vote-btn').forEach(btn => btn.disabled = true);
 }
 
 // Afficher la galerie
