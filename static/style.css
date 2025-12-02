@@ -132,6 +132,15 @@ h1, h2 {
     display: block;
     background: #f9f9f9;
     padding: 8px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: auto;
+}
+
+.photo-img:active {
+    -webkit-touch-callout: none;
 }
 
 .photo-footer {
@@ -186,6 +195,10 @@ h1, h2 {
     object-fit: contain;
     width: auto;
     height: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .close {

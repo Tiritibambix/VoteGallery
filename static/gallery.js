@@ -47,6 +47,9 @@ function renderGallery() {
             </div>
         `;
         
+        // Désactiver le clic-droit sur l'image
+        card.querySelector('.photo-img').addEventListener('contextmenu', (e) => e.preventDefault());
+        
         // Zoom sur click photo
         card.querySelector('.photo-img').addEventListener('click', () => openModal(photo));
         
@@ -112,6 +115,8 @@ function vote(photo, btn) {
 function openModal(photo) {
     modal.style.display = 'flex';
     modalImg.src = `/photos/${photo}`;
+    // Désactiver le clic-droit sur l'image en grand
+    modalImg.addEventListener('contextmenu', (e) => e.preventDefault());
 }
 
 closeBtn.addEventListener('click', () => {
