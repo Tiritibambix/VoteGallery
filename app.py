@@ -3,7 +3,7 @@ import uuid
 import sqlite3
 from datetime import datetime
 from functools import wraps
-from flask import Flask, render_template, request, jsonify, make_response
+from flask import Flask, render_template, request, jsonify, make_response, send_from_directory
 import base64
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -11,6 +11,9 @@ DB_PATH = 'votes.db'
 PHOTOS_DIR = 'photos'
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 MAX_VOTES = 20
+
+# Créer le dossier photos s'il n'existe pas
+os.makedirs(PHOTOS_DIR, exist_ok=True)
 
 # Initialiser la base de données
 def init_db():
@@ -61,6 +64,13 @@ def admin():
         return make_response('Not Authorized', 401, {'WWW-Authenticate': 'Basic realm="Admin"'})
     return render_template('admin.html')
 
+@app.route('/photos/<filename>')
+def serve_photo(filename):
+    try:
+        return send_from_directory(PHOTOS_DIR, filename)
+    except FileNotFoundError:
+        return jsonify({'error': 'Photo not found'}), 404
+
 # API endpoints
 @app.route('/api/photos')
 def api_photos():
@@ -71,17 +81,21 @@ def api_photos():
 
 @app.route('/api/user_votes')
 def api_user_votes():
-    user_id = get_user_id()
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('SELECT COUNT(*) FROM votes WHERE user_id = ?', (user_id,))
-    count = c.fetchone()[0]
-    
-    c.execute('SELECT photo FROM votes WHERE user_id = ?', (user_id,))
-    voted_photos = [row[0] for row in c.fetchall()]
-    conn.close()
-    
-    return jsonify({'votes': count, 'voted_photos': voted_photos})
+    try:
+        user_id = get_user_id()
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('SELECT COUNT(*) FROM votes WHERE user_id = ?', (user_id,))
+        count = c.fetchone()[0]
+        
+        c.execute('SELECT photo FROM votes WHERE user_id = ?', (user_id,))
+        voted_photos = [row[0] for row in c.fetchall()]
+        conn.close()
+        
+        return jsonify({'votes': count, 'voted_photos': voted_photos})
+    except Exception as e:
+        app.logger.error(f"Erreur /api/user_votes: {str(e)}")
+        return jsonify({'votes': 0, 'voted_photos': []}), 200
 
 @app.route('/api/vote', methods=['POST'])
 def api_vote():
