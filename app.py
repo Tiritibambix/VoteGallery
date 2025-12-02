@@ -3,8 +3,11 @@ import uuid
 import sqlite3
 from datetime import datetime
 from functools import wraps
-from flask import Flask, render_template, request, jsonify, make_response, send_from_directory
+from flask import Flask, render_template, request, jsonify, make_response, send_from_directory, send_file
 import base64
+from io import BytesIO
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -157,6 +160,61 @@ def api_admin_stats():
         return jsonify(stats)
     except Exception as e:
         app.logger.error(f"Erreur /api/admin/stats: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/export')
+@require_auth
+def api_admin_export():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('SELECT photo, COUNT(*) as count FROM votes GROUP BY photo ORDER BY count DESC')
+        stats = c.fetchall()
+        conn.close()
+        
+        # Créer un workbook Excel
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Resultats Votes"
+        
+        # En-têtes
+        ws['A1'] = 'Photo'
+        ws['B1'] = 'Votes'
+        
+        header_fill = PatternFill(start_color="007bff", end_color="007bff", fill_type="solid")
+        header_font = Font(bold=True, color="FFFFFF")
+        
+        ws['A1'].fill = header_fill
+        ws['B1'].fill = header_fill
+        ws['A1'].font = header_font
+        ws['B1'].font = header_font
+        
+        ws['A1'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['B1'].alignment = Alignment(horizontal="center", vertical="center")
+        
+        # Données
+        for idx, (photo, count) in enumerate(stats, start=2):
+            ws[f'A{idx}'] = photo
+            ws[f'B{idx}'] = count
+            ws[f'B{idx}'].alignment = Alignment(horizontal="center")
+        
+        # Ajuster les largeurs
+        ws.column_dimensions['A'].width = 40
+        ws.column_dimensions['B'].width = 12
+        
+        # Sauvegarder en mémoire
+        output = BytesIO()
+        wb.save(output)
+        output.seek(0)
+        
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=f'vote_results_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+        )
+    except Exception as e:
+        app.logger.error(f"Erreur /api/admin/export: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
