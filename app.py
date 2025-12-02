@@ -7,7 +7,12 @@ from flask import Flask, render_template, request, jsonify, make_response, send_
 import base64
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
-DB_PATH = 'votes.db'
+
+# Créer le répertoire de données s'il n'existe pas
+DATA_DIR = os.path.join(os.getcwd(), 'data')
+os.makedirs(DATA_DIR, exist_ok=True)
+
+DB_PATH = os.path.join(DATA_DIR, 'votes.db')
 PHOTOS_DIR = 'photos'
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 MAX_VOTES = 20
@@ -17,13 +22,17 @@ os.makedirs(PHOTOS_DIR, exist_ok=True)
 
 # Initialiser la base de données
 def init_db():
-    if not os.path.exists(DB_PATH):
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('''CREATE TABLE votes
-                     (id INTEGER PRIMARY KEY, user_id TEXT, photo TEXT, timestamp DATETIME)''')
-        conn.commit()
-        conn.close()
+    try:
+        if not os.path.exists(DB_PATH):
+            conn = sqlite3.connect(DB_PATH)
+            c = conn.cursor()
+            c.execute('''CREATE TABLE votes
+                         (id INTEGER PRIMARY KEY, user_id TEXT, photo TEXT, timestamp DATETIME)''')
+            conn.commit()
+            conn.close()
+            app.logger.info(f"Database initialized at {DB_PATH}")
+    except Exception as e:
+        app.logger.error(f"Database initialization error: {str(e)}")
 
 # Récupérer ou créer l'UUID utilisateur
 def get_user_id():
@@ -133,17 +142,22 @@ def api_vote():
         
         return jsonify({'success': True})
     except Exception as e:
+        app.logger.error(f"Erreur /api/vote: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/admin/stats')
 @require_auth
 def api_admin_stats():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('SELECT photo, COUNT(*) as count FROM votes GROUP BY photo ORDER BY count DESC')
-    stats = [{'photo': row[0], 'votes': row[1]} for row in c.fetchall()]
-    conn.close()
-    return jsonify(stats)
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('SELECT photo, COUNT(*) as count FROM votes GROUP BY photo ORDER BY count DESC')
+        stats = [{'photo': row[0], 'votes': row[1]} for row in c.fetchall()]
+        conn.close()
+        return jsonify(stats)
+    except Exception as e:
+        app.logger.error(f"Erreur /api/admin/stats: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     init_db()
