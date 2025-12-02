@@ -170,6 +170,20 @@ def api_admin_stats():
         app.logger.error(f"Erreur /api/admin/stats: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/admin/count')
+@require_auth
+def api_admin_count():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('SELECT COUNT(DISTINCT user_id) FROM votes')
+        user_count = c.fetchone()[0]
+        conn.close()
+        return jsonify({'users': user_count})
+    except Exception as e:
+        app.logger.error(f"Erreur /api/admin/count: {str(e)}")
+        return jsonify({'users': 0}), 200
+
 @app.route('/api/admin/export')
 @require_auth
 def api_admin_export():

@@ -9,7 +9,10 @@
 <body>
     <div class="container">
         <div class="admin-header">
-            <h1>📊 Résultats des votes</h1>
+            <div>
+                <h1>📊 Résultats des votes</h1>
+                <p id="user-count" style="font-size: 14px; color: #666; margin-top: 8px;">Votants : <strong>0</strong></p>
+            </div>
             <button class="btn btn-export" onclick="exportExcel()">📥 Exporter Excel</button>
         </div>
         
@@ -56,12 +59,23 @@
                 .catch(e => console.error('Erreur:', e));
         }
 
+        function loadUserCount() {
+            fetch('/api/admin/count')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('user-count').innerHTML = `Votants : <strong>${data.users}</strong>`;
+                })
+                .catch(e => console.error('Erreur:', e));
+        }
+
         function exportExcel() {
             window.location.href = '/api/admin/export';
         }
 
         loadStats();
+        loadUserCount();
         setInterval(loadStats, 5000);
+        setInterval(loadUserCount, 5000);
     </script>
     
     <script src="/static/noclickright.js"></script>
