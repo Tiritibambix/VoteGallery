@@ -83,6 +83,14 @@ def serve_photo(filename):
     except FileNotFoundError:
         return jsonify({'error': 'Photo not found'}), 404
 
+@app.route('/static/noclickright.js')
+def no_click_right():
+    return '''
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+document.addEventListener('dragstart', (e) => e.preventDefault());
+document.addEventListener('selectstart', (e) => e.preventDefault());
+    ''', 200, {'Content-Type': 'application/javascript'}
+
 # API endpoints
 @app.route('/api/photos')
 def api_photos():
