@@ -174,11 +174,25 @@ def api_admin_stats():
 @require_auth
 def api_admin_export():
     try:
+        # Récupérer toutes les photos
+        all_photos = []
+        if os.path.exists(PHOTOS_DIR):
+            all_photos = sorted([f for f in os.listdir(PHOTOS_DIR) if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif'))])
+        
+        # Récupérer les votes par photo
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute('SELECT photo, COUNT(*) as count FROM votes GROUP BY photo ORDER BY count DESC')
-        stats = c.fetchall()
+        voted_photos = {row[0]: row[1] for row in c.fetchall()}
         conn.close()
+        
+        # Créer liste complète : photos votées + photos sans votes
+        stats = []
+        for photo in all_photos:
+            stats.append((photo, voted_photos.get(photo, 0)))
+        
+        # Trier par votes décroissants, puis par nom
+        stats.sort(key=lambda x: (-x[1], x[0]))
         
         wb = Workbook()
         ws = wb.active
