@@ -19,7 +19,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: tiritibambix/photo-vote
+  IMAGE_NAME: tiritibambix/votegallery
 
 jobs:
   setup:
