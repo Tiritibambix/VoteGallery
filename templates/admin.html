@@ -10,62 +10,33 @@
     <div class="container">
         <div class="admin-header">
             <h1>📊 Résultats des votes</h1>
-            <button class="btn btn-export" onclick="exportExcel()">📥 Exporter en Excel</button>
         </div>
         
-        <div class="admin-table-wrapper">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Photo</th>
-                        <th>Votes</th>
-                    </tr>
-                </thead>
-                <tbody id="stats-body">
-                    <tr><td colspan="2">Chargement...</td></tr>
-                </tbody>
-            </table>
-        </div>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Votes</th>
+                </tr>
+            </thead>
+            <tbody id="stats-body">
+                <tr><td colspan="2">Chargement...</td></tr>
+            </tbody>
+        </table>
     </div>
 
     <script>
-        function loadStats() {
-            fetch('/api/admin/stats')
-                .then(r => r.json())
-                .then(data => {
-                    const body = document.getElementById('stats-body');
-                    body.innerHTML = '';
-                    
-                    if (data.length === 0) {
-                        body.innerHTML = '<tr><td colspan="2">Aucun vote enregistré</td></tr>';
-                        return;
-                    }
-                    
-                    data.forEach(row => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>
-                                <div class="admin-photo-cell">
-                                    <img src="/photos/${row.photo}" alt="${row.photo}" class="admin-thumbnail">
-                                    <span class="photo-name">${row.photo}</span>
-                                </div>
-                            </td>
-                            <td class="votes-cell">${row.votes}</td>
-                        `;
-                        body.appendChild(tr);
-                    });
+        fetch('/api/admin/stats')
+            .then(r => r.json())
+            .then(data => {
+                const body = document.getElementById('stats-body');
+                body.innerHTML = '';
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${row.photo}</td><td>${row.votes}</td>`;
+                    body.appendChild(tr);
                 });
-        }
-
-        function exportExcel() {
-            window.location.href = '/api/admin/export';
-        }
-
-        // Charger les stats au démarrage
-        loadStats();
-        
-        // Recharger toutes les 5 secondes
-        setInterval(loadStats, 5000);
+            });
     </script>
 </body>
 </html>
