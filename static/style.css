@@ -115,6 +115,7 @@ h1, h2 {
     transition: transform 0.2s;
     display: flex;
     flex-direction: column;
+    height: 280px;
 }
 
 .photo-card:hover {
@@ -123,17 +124,21 @@ h1, h2 {
 
 .photo-img {
     width: 100%;
-    height: 250px;
-    object-fit: cover;
+    height: 230px;
+    object-fit: contain;
+    object-position: center;
     cursor: pointer;
     flex-grow: 1;
     display: block;
+    background: #f9f9f9;
+    padding: 8px;
 }
 
 .photo-footer {
     padding: 15px;
     text-align: center;
     background: white;
+    border-top: 1px solid #eee;
 }
 
 .vote-btn {
