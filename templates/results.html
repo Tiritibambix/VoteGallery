@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats - Vote Gallery</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
+</head>
+<body>
+    <div class="results-container">
+        <div class="results-header">
+            <h1>🏆 Les favoris du groupe</h1>
+            <p class="results-subtitle">Découvrez les photos les plus aimées</p>
+            <div class="results-stats">
+                <div class="stat-card">
+                    <span class="stat-number" id="total-votes">0</span>
+                    <span class="stat-label">votes collectés</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="total-users">0</span>
+                    <span class="stat-label">votants</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="total-photos">0</span>
+                    <span class="stat-label">photos en galerie</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-grid" id="results-grid">
+            <div class="loading">Chargement des résultats...</div>
+        </div>
+
+        <div class="results-footer">
+            <a href="/" class="btn btn-primary">← Retour à l'accueil</a>
+        </div>
+    </div>
+
+    <script>
+        async function loadResults() {
+            try {
+                const statsRes = await fetch('/api/admin/stats');
+                const countRes = await fetch('/api/admin/count');
+                const photosRes = await fetch('/api/photos');
+                
+                const stats = await statsRes.json();
+                const count = await countRes.json();
+                const photos = await photosRes.json();
+
+                const grid = document.getElementById('results-grid');
+                grid.innerHTML = '';
+
+                if (stats.length === 0) {
+                    grid.innerHTML = '<div class="no-results">Aucun vote pour le moment...</div>';
+                    document.getElementById('total-votes').textContent = '0';
+                    document.getElementById('total-users').textContent = count.users;
+                    document.getElementById('total-photos').textContent = photos.length;
+                    return;
+                }
+
+                // Calculer les statistiques
+                const totalVotes = stats.reduce((sum, s) => sum + s.votes, 0);
+                const maxVotes = Math.max(...stats.map(s => s.votes));
+
+                document.getElementById('total-votes').textContent = totalVotes;
+                document.getElementById('total-users').textContent = count.users;
+                document.getElementById('total-photos').textContent = photos.length;
+
+                // Afficher les résultats
+                stats.forEach((item, index) => {
+                    const percentage = (item.votes / maxVotes) * 100;
+                    const rank = index + 1;
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+
+                    const card = document.createElement('div');
+                    card.className = 'result-card';
+                    card.innerHTML = `
+                        <div class="result-rank">${medal || `#${rank}`}</div>
+                        <div class="result-image">
+                            <img src="/photos/${item.photo}" alt="${item.photo}">
+                        </div>
+                        <div class="result-info">
+                            <h3>${item.photo}</h3>
+                            <div class="result-bar">
+                                <div class="result-bar-fill" style="width: ${percentage}%"></div>
+                            </div>
+                            <div class="result-votes">${item.votes} vote${item.votes > 1 ? 's' : ''}</div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (e) {
+                console.error('Erreur:', e);
+                document.getElementById('results-grid').innerHTML = '<div class="error">Erreur de chargement</div>';
+            }
+        }
+
+        loadResults();
+    </script>
+    
+    <script src="/static/noclickright.js"></script>
+</body>
+</html>

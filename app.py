@@ -76,6 +76,11 @@ def admin():
         return make_response('Not Authorized', 401, {'WWW-Authenticate': 'Basic realm="Admin"'})
     return render_template('admin.html')
 
+@app.route('/results')
+def results():
+    response = make_response(render_template('results.html'))
+    return response
+
 @app.route('/photos/<filename>')
 def serve_photo(filename):
     try:
