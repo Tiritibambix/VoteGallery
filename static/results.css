@@ -92,11 +92,15 @@
     min-height: 300px;
 }
 
-.result-image.portrait {
-    min-height: 150px;
-    max-width: 60%;
-    margin-left: auto;
-    margin-right: auto;
+.result-image img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    padding: 15px;
+}
+
+.result-image img.portrait {
+    width: 50%;
 }
 
 .result-info {
@@ -177,10 +181,6 @@
     .result-image {
         min-height: 250px;
     }
-
-    .result-image.portrait {
-        min-height: 125px;
-    }
 }
 
 @media (max-width: 768px) {
@@ -242,10 +242,6 @@
     .result-image {
         min-height: 200px;
         margin-bottom: 18px;
-    }
-
-    .result-image.portrait {
-        min-height: 100px;
     }
 }
 
@@ -318,9 +314,5 @@
     .result-image {
         min-height: 150px;
         margin-bottom: 15px;
-    }
-
-    .result-image.portrait {
-        min-height: 75px;
     }
 }

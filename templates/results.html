@@ -75,22 +75,10 @@
 
                     const card = document.createElement('div');
                     card.className = 'result-card';
-                    
-                    const img = document.createElement('img');
-                    img.src = `/photos/${item.photo}`;
-                    img.alt = 'Photo';
-                    
-                    // Déterminer si portrait après chargement
-                    img.onload = function() {
-                        const imageContainer = card.querySelector('.result-image');
-                        if (this.naturalHeight > this.naturalWidth) {
-                            imageContainer.classList.add('portrait');
-                        }
-                    };
-
                     card.innerHTML = `
                         <div class="result-rank">${medal || `#${rank}`}</div>
                         <div class="result-image">
+                            <img src="/photos/${item.photo}" alt="Photo" onload="if(this.naturalHeight > this.naturalWidth) this.classList.add('portrait')">
                         </div>
                         <div class="result-info">
                             <div class="result-bar">
@@ -99,8 +87,6 @@
                             <div class="result-votes">${item.votes} vote${item.votes > 1 ? 's' : ''}</div>
                         </div>
                     `;
-                    
-                    card.querySelector('.result-image').appendChild(img);
                     grid.appendChild(card);
                 });
             } catch (e) {
