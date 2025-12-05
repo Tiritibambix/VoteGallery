@@ -40,8 +40,8 @@
     <script>
         async function loadResults() {
             try {
-                const statsRes = await fetch('/api/admin/stats');
-                const countRes = await fetch('/api/admin/count');
+                const statsRes = await fetch('/api/results/stats');
+                const countRes = await fetch('/api/results/count');
                 const photosRes = await fetch('/api/photos');
                 
                 const stats = await statsRes.json();

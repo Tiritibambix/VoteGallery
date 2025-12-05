@@ -189,6 +189,32 @@ def api_admin_count():
         app.logger.error(f"Erreur /api/admin/count: {str(e)}")
         return jsonify({'users': 0}), 200
 
+@app.route('/api/results/stats')
+def api_results_stats():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('SELECT photo, COUNT(*) as count FROM votes GROUP BY photo ORDER BY count DESC')
+        stats = [{'photo': row[0], 'votes': row[1]} for row in c.fetchall()]
+        conn.close()
+        return jsonify(stats)
+    except Exception as e:
+        app.logger.error(f"Erreur /api/results/stats: {str(e)}")
+        return jsonify([]), 200
+
+@app.route('/api/results/count')
+def api_results_count():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('SELECT COUNT(DISTINCT user_id) FROM votes')
+        user_count = c.fetchone()[0]
+        conn.close()
+        return jsonify({'users': user_count})
+    except Exception as e:
+        app.logger.error(f"Erreur /api/results/count: {str(e)}")
+        return jsonify({'users': 0}), 200
+
 @app.route('/api/admin/export')
 @require_auth
 def api_admin_export():
