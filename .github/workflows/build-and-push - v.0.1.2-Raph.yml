@@ -19,7 +19,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: tiritibambix/votegallery-v.0.1.2-Raph
+  IMAGE_NAME: tiritibambix/votegallery-v.0.1.2-raph
 
 jobs:
   setup:
