@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote Gallery - Instructions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="instructions-card">
+            <h1>📸 Vote Gallery</h1>
+            
+            <div class="welcome-section">
+                <p class="welcome-intro">Bienvenue ! Tu vas voter pour tes 20 photos préférées.</p>
+                
+                <div class="character-section">
+                    <h2>🎭 Avant d'entrer dans la galerie, je te propose un petit jeu.</h2>
+                    <p>Pendant quelques minutes, tu ne votes pas en tant que toi : <strong>tu deviens un personnage.</strong></p>
+                    
+<div class="character-description">
+    <p>Ce personnage a 32–36 ans, vit dans une ville moyenne, et partage son quotidien avec une petite tribu soudée d’amis créatifs, geeks et artistes. Il est sensible, drôle, curieux, avec une vraie fibre esthétique. Il aime la culture pop, les jeux vidéo, la musique, la nature, et les lieux qui ont une âme.</p>
+
+    <p>Il a une forte personnalité, un sens aigu de la justice, et préfère toujours la qualité, le durable, l’authentique. Son style est sobre et minimaliste, mais il repère immédiatement ce qui est vrai, beau ou humain.</p>
+
+    <p>Il prépare un mariage comme une fête libre et atypique, pleine d’énergie, de surprises, d’adrénaline. Il veut des images qui respirent : du mouvement, des rires, de l’émotion brute, de la complicité.</p>
+</div>
+
+<div class="question-section">
+    <p><strong>En votant, pose-toi cette question :</strong></p>
+    <blockquote>« Si j'étais ce personnage, quelles photos me toucheraient le plus ? »</blockquote>
+    <p>Tu choisis <strong>20 images</strong>. Pas plus.<br>
+    Laisse parler ton instinct.</p>
+</div>
+
+            </div>
+            
+            <div class="instructions-box">
+                <h2>📋 Comment ça marche ?</h2>
+                <ul>
+                    <li>Accède à la galerie de photos</li>
+                    <li>Vote pour tes 20 photos préférées</li>
+                    <li>Un vote par photo, max 20 votes au total</li>
+                    <li>Clique sur une photo pour la voir en grand</li>
+                </ul>
+            </div>
+            
+            <a href="/gallery" class="btn btn-primary">Accéder à la galerie →</a>
+        </div>
+    </div>
+    
+    <script src="/static/noclickright.js"></script>
+</body>
+</html>
